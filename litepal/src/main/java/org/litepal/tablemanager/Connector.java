@@ -111,15 +111,15 @@ public class Connector {
 	 * @throws org.litepal.exceptions.InvalidAttributesException
 	 * @throws ParseConfigurationFileException
 	 */
-	private static LitePalOpenHelper buildConnection() {
+	private static LitePalOpenHelper buildConnection(String dbNamePrefix) {
 		if (mLitePalAttr == null) {
 			LitePalParser.parseLitePalConfiguration();
 			mLitePalAttr = LitePalAttr.getInstance();
 		}
 		if (mLitePalAttr.checkSelfValid()) {
 			if (mLitePalHelper == null) {
-				mLitePalHelper = new LitePalOpenHelper(mLitePalAttr.getDbName(),
-						mLitePalAttr.getVersion());
+        String dbName = dbNamePrefix != null ? dbNamePrefix + "_" + mLitePalAttr.getDbName() : mLitePalAttr.getDbName();
+				mLitePalHelper = new LitePalOpenHelper(dbName, mLitePalAttr.getVersion());
 			}
 			return mLitePalHelper;
 		} else {
@@ -127,4 +127,12 @@ public class Connector {
 		}
 	}
 
+	private static LitePalOpenHelper buildConnection() {
+    return buildConnection(null);
+  }
+
+  public static void init(String dbNamePrefix) {
+    mLitePalHelper = null;
+    buildConnection(dbNamePrefix);
+  }
 }
