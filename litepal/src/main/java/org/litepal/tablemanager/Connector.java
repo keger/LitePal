@@ -19,6 +19,7 @@ package org.litepal.tablemanager;
 import org.litepal.exceptions.InvalidAttributesException;
 import org.litepal.parser.LitePalAttr;
 import org.litepal.parser.LitePalParser;
+import org.litepal.tablemanager.DatabaseEventListener;
 
 import android.database.sqlite.SQLiteDatabase;
 
@@ -111,7 +112,7 @@ public class Connector {
 	 * @throws org.litepal.exceptions.InvalidAttributesException
 	 * @throws ParseConfigurationFileException
 	 */
-	private static LitePalOpenHelper buildConnection(String dbNamePrefix) {
+	private static LitePalOpenHelper buildConnection(String dbNamePrefix, DatabaseEventListener listener) {
 		if (mLitePalAttr == null) {
 			LitePalParser.parseLitePalConfiguration();
 			mLitePalAttr = LitePalAttr.getInstance();
@@ -119,7 +120,7 @@ public class Connector {
 		if (mLitePalAttr.checkSelfValid()) {
 			if (mLitePalHelper == null) {
         String dbName = dbNamePrefix != null ? dbNamePrefix + "_" + mLitePalAttr.getDbName() : mLitePalAttr.getDbName();
-				mLitePalHelper = new LitePalOpenHelper(dbName, mLitePalAttr.getVersion());
+				mLitePalHelper = new LitePalOpenHelper(dbName, mLitePalAttr.getVersion(), listener);
 			}
 			return mLitePalHelper;
 		} else {
@@ -128,11 +129,11 @@ public class Connector {
 	}
 
 	private static LitePalOpenHelper buildConnection() {
-    return buildConnection(null);
+    return buildConnection(null, null);
   }
 
-  public static void init(String dbNamePrefix) {
+  public static void init(String dbNamePrefix, DatabaseEventListener listener) {
     mLitePalHelper = null;
-    buildConnection(dbNamePrefix);
+    buildConnection(dbNamePrefix, listener);
   }
 }
